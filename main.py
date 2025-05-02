@@ -17,7 +17,7 @@ def scrape():
     query = f"{ticker} lang:en"
     try:
         result = subprocess.run(
-            ['snscrape', '--jsonl', '--max-results', '20', f'twitter-search:"{query}"'],
+            ['snscrape', '--jsonl', '--max-results', '20', f'twitter-search', f'{query}'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
