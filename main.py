@@ -18,12 +18,13 @@ def scrape():
     query = f"{ticker} lang:en"
     try:
         result = subprocess.run(
-            ['snscrape', '--jsonl', '--max-results', '20', f'twitter-search:"{query}"'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True
-        )
+    ['snscrape', '--jsonl', '--max-results', '20', 'twitter-search', f'{ticker} lang:en'],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True,
+    check=True
+)
+
         tweets = [json.loads(line)["content"] for line in result.stdout.strip().split("\n") if line]
         return jsonify({'ticker': ticker, 'tweets': tweets})
 
