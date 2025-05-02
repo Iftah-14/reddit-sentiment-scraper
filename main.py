@@ -1,26 +1,35 @@
-import snscrape.modules.twitter as sntwitter
 from flask import Flask, request, jsonify
+import subprocess
+import json
+import os
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Twitter Scraper is running! Use /scrape?ticker=AAPL"
+    return "✅ Flask is running. Use /scrape?ticker=NVDA"
 
 @app.route('/scrape')
 def scrape():
     ticker = request.args.get('ticker')
     if not ticker:
-        return jsonify({'error': 'Missing ticker param'}), 400
+        return jsonify({'error': 'Ticker is required'}), 400
 
     query = f"{ticker} lang:en"
-    tweets = []
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
-        if i >= 20:
-            break
-        tweets.append(tweet.content)
+    try:
+        result = subprocess.run(
+            ['snscrape', '--jsonl', '--max-results', '20', f'twitter-search:"{query}"'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+        tweets = [json.loads(line)["content"] for line in result.stdout.strip().split("\n") if line]
+        return jsonify({'ticker': ticker, 'tweets': tweets})
 
-    return jsonify({'ticker': ticker, 'tweets': tweets})
+    except subprocess.CalledProcessError as e:
+        return jsonify({'error': 'Failed to scrape tweets', 'details': e.stderr}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
