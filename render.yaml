@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: twitter-sentiment-scraper
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: |
+      apt-get update && apt-get install -y ca-certificates && \
+      export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt && \
+      python main.py
