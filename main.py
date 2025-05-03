@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import subprocess
 import json
 
-app = Flask(__name__)  # ✅ This must come before any @app.route
+app = Flask(__name__)
 
 @app.route('/')
 def index():
@@ -16,7 +16,7 @@ def scrape():
 
     try:
         result = subprocess.run(
-            ['snscrape', '--jsonl', '--max-results', '50', f'reddit-search:"{ticker}"'],
+            ['snscrape', '--jsonl', '--max-results', '50', 'reddit-search', ticker],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -31,7 +31,3 @@ def scrape():
 
     except subprocess.CalledProcessError as e:
         return jsonify({'error': 'Failed to scrape Reddit posts', 'details': e.stderr}), 500
-
-# Optional: only for local debugging
-# if __name__ == "__main__":
-#     app.run(debug=True)
