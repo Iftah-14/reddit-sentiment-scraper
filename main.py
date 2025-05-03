@@ -16,7 +16,7 @@ def scrape():
 
     try:
         result = subprocess.run(
-            ['snscrape', '--jsonl', '--max-results', '50', 'reddit-subreddit:all'],
+            ['snscrape', '--jsonl', '--max-results', '50', f'reddit-search:"{ticker}"'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
