@@ -3,16 +3,17 @@ import praw
 
 app = Flask(__name__)
 
-# Reddit API credentials
+# Reddit API credentials — make sure these are valid
 reddit = praw.Reddit(
     client_id="YLxAAUb0IJy4Okz7Tvhcfg",
     client_secret="e30IywaS21aAhSYy0XAm6i2dFz3EZw",
-    user_agent="StockSentimentAI/0.1 by Wonderful_Wash7798"
+    user_agent="StockSentimentAI/0.1 by u/Wonderful_Wash7798",
+    check_for_async=False  # avoid async-related runtime warnings
 )
 
 @app.route('/')
 def home():
-    return "✅ Reddit sentiment scraper is running. Use /scrape?ticker=AAPL"
+    return "✅ Reddit Sentiment Scraper is running. Use /scrape?ticker=AAPL"
 
 @app.route('/scrape')
 def scrape():
@@ -22,12 +23,7 @@ def scrape():
 
     posts = []
     try:
-        for submission in reddit.subreddit("all").search(
-            query=ticker,
-            sort='new',
-            limit=20,
-            params={'timeout': 10}  # ⏱️ added timeout to avoid hanging
-        ):
+        for submission in reddit.subreddit("all").search(ticker, limit=20, sort='new'):
             posts.append({
                 'title': submission.title,
                 'text': submission.selftext,
@@ -40,3 +36,7 @@ def scrape():
         return jsonify({'ticker': ticker, 'posts': posts})
     except Exception as e:
         return jsonify({'error': 'Failed to fetch Reddit posts', 'details': str(e)}), 500
+
+# To run locally (won't be used by gunicorn, but handy for testing)
+if __name__ == '__main__':
+    app.run(debug=True, port=8080)
