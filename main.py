@@ -1,4 +1,5 @@
-import snscrape.modules.twitter as sntwitter
+import subprocess
+import json
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -13,13 +14,17 @@ def scrape():
     if not ticker:
         return jsonify({'error': 'Ticker is required'}), 400
 
-    query = f"{ticker} lang:en"
+    query = f'{ticker} site:reddit.com'  # search Reddit mentions
     try:
-        tweets = []
-        for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
-            if i >= 20:
-                break
-            tweets.append(tweet.content)
-        return jsonify({'ticker': ticker, 'tweets': tweets})
-    except Exception as e:
-        return jsonify({'error': 'Failed to scrape tweets', 'details': str(e)}), 500
+        result = subprocess.run(
+            ['snscrape', '--jsonl', '--max-results', '20', f'reddit-search:"{query}"'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+        posts = [json.loads(line)["content"] for line in result.stdout.strip().split("\n") if line]
+        return jsonify({'ticker': ticker, 'reddit_posts': posts})
+
+    except subprocess.CalledProcessError as e:
+        return jsonify({'error': 'Failed to scrape Reddit posts', 'details': e.stderr}), 500
