@@ -1,1 +1,1 @@
-# twitter-sentiment-scraper
+# reddit-sentiment-scraper
