@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 # Reddit API credentials
 reddit = praw.Reddit(
-    client_id="YLxAAUb0IJy4Okz7Tvhcfg",
+    client_id="YLxAAUbOlJy4Okz7Tvhcfg",
     client_secret="e30IywaS21aAhSYy0XAm6i2dFz3EZw",
-    user_agent="StockSentimentAI/0.1 by Wonderful_Wash7798"
+    user_agent="StockSentimentAI/0.1 (by Wonderful_Wash7798)"
 )
 
 @app.route('/')
