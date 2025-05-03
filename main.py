@@ -1,3 +1,13 @@
+from flask import Flask, request, jsonify
+import subprocess
+import json
+
+app = Flask(__name__)  # ✅ This must come before any @app.route
+
+@app.route('/')
+def index():
+    return '✅ Flask is running. Use /scrape?ticker=NVDA'
+
 @app.route('/scrape')
 def scrape():
     ticker = request.args.get('ticker')
@@ -21,3 +31,7 @@ def scrape():
 
     except subprocess.CalledProcessError as e:
         return jsonify({'error': 'Failed to scrape Reddit posts', 'details': e.stderr}), 500
+
+# Optional: only for local debugging
+# if __name__ == "__main__":
+#     app.run(debug=True)
